@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verus Studio - Watch Livestream</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.3.2/flv.min.js" integrity="sha512-viIpeG+70da8uvm9aktaT4dXxlalio52xjaKmGSjiUXrfPo4jRlp6elFvAEuV7GxmVB/qwQZiCQNadaF3DfVZg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #ff0000;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #ff0000;
+        }
+
+        .livestream-info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #videoElement {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Watch Livestream</h1>
+    </header>
+
+    <main>
+        <h2>Livestream Information</h2>
+
+        <div class="livestream-info" id="stream-info">Loading...</div>
+        
+        <video id="videoElement" controls autoplay></video>
+    </main>
+
+    <script>
+        // Load initial stream information when the page loads
+        window.onload = loadStreamInformation;
+
+        async function loadStreamInformation() {
+            try {
+                const searchParams = new URLSearchParams(window.location.search);
+                const streamId = searchParams.get('id');
+
+                const response = await fetch(`/getStream/${streamId}`);
+                const data = await response.json();
+
+                const streamInfoElement = document.getElementById('stream-info');
+                if (data.streamName) {
+                    streamInfoElement.innerText = `You are watching: ${data.streamName}`;
+                    console.log(data)
+                    // Setup FLV player
+                    if (flvjs.isSupported()) {
+                        const videoElement = document.getElementById('videoElement');
+                        console.log(`https://verus-studio.onrender.com/live/${data.streamName}.flv`)
+                        const flvPlayer = flvjs.createPlayer({
+                            type: 'flv',
+                            url: `https://verus-studio.onrender.com:8000/live/${data.streamName}.flv`, // Assuming streamKey is used in the Node Media Server
+                        });
+                        flvPlayer.attachMediaElement(videoElement);
+                        flvPlayer.load();
+                        flvPlayer.play();
+                    }
+                } else {
+                    streamInfoElement.innerText = 'Livestream not found.';
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error loading stream information');
+            }
+        }
+    </script>
+
+</body>
+</html>

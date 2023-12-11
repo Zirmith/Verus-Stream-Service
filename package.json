@@ -1,0 +1,30 @@
+{
+  "name": "verus-stream-service",
+  "version": "1.0.0",
+  "description": "Custom Stream Thing",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zirmith/Verus-Stream-Service.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zirmith/Verus-Stream-Service/issues"
+  },
+  "homepage": "https://github.com/Zirmith/Verus-Stream-Service#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "node-media-server": "^2.6.2",
+    "nodemon": "^3.0.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "ws": "^8.15.0"
+  }
+}

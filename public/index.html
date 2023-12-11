@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verus Studio - Livestream Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #ff0000;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h2 {
+            color: #ff0000;
+        }
+
+        .livestream-card {
+            border: 1px solid #ddd;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .livestream-key {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .livestream-details {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            background-color: #ff0000;
+            color: #fff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>YouTube Studio - Livestream Management</h1>
+    </header>
+
+    <main>
+        <h2>Livestream Information</h2>
+
+        <div class="livestream-card">
+            <div class="livestream-key" id="stream-key">Stream Key: Loading...</div>
+            <div class="livestream-details" id="stream-status">Status: Loading...</div>
+            <div class="livestream-details" id="viewers-count">Viewers: Loading...</div>
+            <button class="button" onclick="generateStreamKey()">Generate New Stream Key</button>
+            <button class="button" onclick="endLivestream()">End Livestream</button>
+        </div>
+    </main>
+
+    <script>
+        const streamKeyElement = document.getElementById('stream-key');
+        const streamStatusElement = document.getElementById('stream-status');
+        const viewersCountElement = document.getElementById('viewers-count');
+
+        // Function to update stream information
+        const updateStreamInformation = (data) => {
+            streamKeyElement.innerText = `Stream Key: ${data.streamKey}`;
+            streamStatusElement.innerText = `Status: ${data.status}`;
+            viewersCountElement.innerText = `Viewers: ${data.viewers}`;
+        };
+
+        // Function to handle WebSocket messages
+        const handleWebSocketMessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.event === 'livestreamEnded' && data.streamKey === streamKeyElement.innerText.split(': ')[1]) {
+                // Livestream ended, update UI accordingly
+                streamStatusElement.innerText = 'Status: Ended';
+                viewersCountElement.innerText = 'Viewers: 0';
+            }
+        };
+
+        // Function to end the livestream
+        const endLivestream = async () => {
+            try {
+                const response = await fetch(`/endLivestream/${streamKeyElement.innerText.split(': ')[1]}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                console.error(error);
+                alert('Error ending livestream');
+            }
+        };
+
+        // Function to generate a new stream key
+        const generateStreamKey = async () => {
+            try {
+                const response = await fetch('/createStream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ streamName: 'test' }),
+                });
+
+                const data = await response.json();
+                updateStreamInformation({ streamKey: data.streamKey, status: 'Live', viewers: 0 });
+            } catch (error) {
+                console.error(error);
+                alert('Error generating stream key');
+            }
+        };
+
+        // Load initial stream information when the page loads
+        window.onload = async () => {
+            try {
+                const streamKey = prompt('Enter your stream key:');
+                const response = await fetch(`/getStream/${streamKey}`);
+                const data = await response.json();
+                updateStreamInformation({ streamKey: data.streamKey, status: 'Live', viewers: 0 });
+
+                // Connect to WebSocket for real-time updates
+                const ws = new WebSocket(`ws://${window.location.host}`);
+                ws.addEventListener('message', handleWebSocketMessage);
+            } catch (error) {
+                console.error(error);
+                alert('Error loading stream information');
+            }
+        };
+    </script>
+
+</body>
+</html>
