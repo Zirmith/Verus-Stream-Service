@@ -139,7 +139,7 @@
                 updateStreamInformation({ streamKey: data.streamKey, status: 'Live', viewers: 0 });
 
                 // Connect to WebSocket for real-time updates
-                const ws = new WebSocket(`ws://${window.location.host}`);
+                const ws = new WebSocket(`wss://${window.location.host}`);
                 ws.addEventListener('message', handleWebSocketMessage);
             } catch (error) {
                 console.error(error);
