@@ -77,7 +77,7 @@
                         console.log(`https://verus-studio.onrender.com/live/${data.streamName}.flv`)
                         const flvPlayer = flvjs.createPlayer({
                             type: 'flv',
-                            url: `https://verus-studio.onrender.com:8000/live/${data.streamName}.flv`, // Assuming streamKey is used in the Node Media Server
+                            url: `https://verus-studio.onrender.com/live/${data.streamName}.flv`, // Assuming streamKey is used in the Node Media Server
                         });
                         flvPlayer.attachMediaElement(videoElement);
                         flvPlayer.load();
